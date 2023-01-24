@@ -24,7 +24,6 @@ manifests:
   - k8s/*.yaml
 deploy:
   kubectl:
-    # defaultNamespace: test
     hooks:
       after:
       - container:
