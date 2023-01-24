@@ -1,0 +1,43 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: skaffold/v4beta2
+kind: Config
+build:
+  artifacts:
+  - image: repro
+    ko:
+      fromImage: gcr.io/distroless/base-debian11:debug-nonroot
+manifests:
+  rawYaml:
+  - k8s/*.yaml
+deploy:
+  kubectl:
+    # defaultNamespace: test
+    hooks:
+      after:
+      - container:
+          command: ["echo", "container-hook-0"]
+          containerName: test
+          podName: repro*
+      - container:
+          command: ["echo", "container-hook-1"]
+          containerName: test
+          podName: repro*
+      - host:
+          command: ["./hack/after-deploy-hook.sh"]
+          os: [darwin, linux]
+      - host:
+          command: ["echo", "host-hook-1"]
+          os: [darwin, linux]
